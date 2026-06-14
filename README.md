@@ -72,20 +72,26 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```
 app/
-  page.tsx                  # Dashboard
+  page.tsx                  # Dashboard (stats + recent papers)
   library/
     page.tsx                # Library Browser (taxonomy sidebar + card grid)
     [slug]/page.tsx         # Markdown Viewer (KaTeX math support)
   ruminations/
     page.tsx                # Rumination Tracker (owner-only)
   api/
-    library/route.ts        # Scans sources/QC/, returns parsed JSON index
-    search/route.ts         # Fuse.js search against the index
-    ruminations/route.ts    # Scans syntheses/QC/rumination-*.md
+    library/route.ts        # GET /api/library — full parsed JSON index (ISR 60s)
+    search/route.ts         # GET /api/search?q= — Fuse.js ranked results
+    ruminations/route.ts    # GET /api/ruminations — parsed rumination files
+components/
+  PaperCard.tsx             # Paper card with title, authors, tags, subdomain
+  SearchBar.tsx             # URL-param-driven search input (client component)
+  TaxonomySidebar.tsx       # Subdomain filter sidebar with counts
+  MarkdownRenderer.tsx      # react-markdown + KaTeX renderer
 lib/
-  libraryReader.ts          # Filesystem scanner + gray-matter parser
-  searchIndex.ts            # Fuse.js index builder
-middleware.ts               # Cf-Access-Jwt-Assertion check + /ruminations owner gate
+  libraryReader.ts          # FS scanner, gray-matter parser, stats aggregator
+  libraryReader.test.ts     # Vitest unit tests for the data layer
+proxy.ts                    # Cf-Access-Jwt-Assertion check + /ruminations owner gate
+vitest.config.ts            # Vitest configuration
 ```
 
 **Data directories indexed** (relative to `QCLIB_DATA_ROOT`):
@@ -96,6 +102,19 @@ middleware.ts               # Cf-Access-Jwt-Assertion check + /ruminations owner
 | `syntheses/QC/rumination-*.md` | Rumination Tracker                    |
 
 **Directories excluded from scanning:** `concepts/`, `entities/`, `reports/`, `.openclaw-wiki/`, `_attachments/`, `_views/`
+
+---
+
+## Testing
+
+Unit tests cover the data layer (`lib/libraryReader.ts`) — parsing, field normalisation, directory exclusions, and stats aggregation. Tests run against a temporary fixture directory and require no external data.
+
+```bash
+pnpm test          # run once
+pnpm test:watch    # watch mode during development
+```
+
+All 10 tests should pass before any commit.
 
 ---
 
