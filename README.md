@@ -8,7 +8,7 @@ Web UI for the **Quantum Computing Expert Library**, a research knowledge base m
 
 | Requirement   | Version                                              |
 | ------------- | ---------------------------------------------------- |
-| Node.js       | ≥ 26 (use `nvm use` in this directory)               |
+| Node.js       | ≥ 22 LTS (use `nvm use` in this directory)           |
 | pnpm          | ≥ 11.3.0 (`npm i -g pnpm` or Corepack)               |
 | openclaw data | Accessible at a local path set via `QCLIB_DATA_ROOT` |
 
