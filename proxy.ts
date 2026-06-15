@@ -9,26 +9,25 @@ export function proxy(req: NextRequest) {
         return NextResponse.next();
     }
 
-    // --- Defense-in-depth: verify the request came through Cloudflare Access ---
-    // Cloudflare injects this header after a valid Access session is established.
-    // A missing header means the request bypassed the tunnel entirely.
-    const cfJwt = req.headers.get("cf-access-jwt-assertion");
-    if (!cfJwt) {
-        return new NextResponse("Forbidden", { status: 403 });
-    }
-
     // --- Owner-only route guard ---
+    // All other routes are publicly accessible.
     const pathname = req.nextUrl.pathname;
     const isProtected = PROTECTED_PATHS.some(
         (p) => pathname === p || pathname.startsWith(`${p}/`)
     );
 
     if (isProtected) {
+        // Cloudflare Access is scoped to /ruminations* in the Zero Trust dashboard,
+        // so this header is only present on requests that passed the Access gate.
+        const cfJwt = req.headers.get("cf-access-jwt-assertion");
+        if (!cfJwt) {
+            return new NextResponse("Forbidden", { status: 403 });
+        }
+
         const userEmail = req.headers.get("cf-access-authenticated-user-email");
         const ownerEmail = process.env.OWNER_EMAIL;
 
         if (!ownerEmail) {
-            // Fail closed: if OWNER_EMAIL is not configured, deny access.
             console.error("OWNER_EMAIL env var is not set — denying access to protected route.");
             return new NextResponse("Forbidden", { status: 403 });
         }
