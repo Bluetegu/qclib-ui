@@ -17,10 +17,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10 space-y-10">
+    <div className="mx-auto max-w-6xl px-5 py-10 space-y-10">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Quantum Computing Library</h1>
-        <p className="mt-1 text-neutral-500">Research knowledge base maintained by openclaw</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Quantum Computing Library</h1>
+        <p className="mt-1.5 text-slate-500">Research knowledge base maintained by openclaw</p>
       </div>
 
       <Suspense>
@@ -28,7 +28,7 @@ export default function DashboardPage() {
       </Suspense>
 
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           <strong>Error loading library:</strong> {error}
         </div>
       )}
@@ -36,8 +36,8 @@ export default function DashboardPage() {
       {stats && (
         <>
           <section>
-            <h2 className="mb-4 text-lg font-semibold">Overview</h2>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">Overview</h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
               <StatCard label="Total papers" value={stats.total} />
               {Object.entries(stats.bySubdomain).map(([sd, count]) => (
                 <Link key={sd} href={`/library?subdomain=${sd}`}>
@@ -50,8 +50,8 @@ export default function DashboardPage() {
           {stats.recent.length > 0 && (
             <section>
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold">Recent Additions</h2>
-                <Link href="/library" className="text-sm text-indigo-600 hover:underline">
+                <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-400">Recent Additions</h2>
+                <Link href="/library" className="text-sm text-indigo-600 hover:text-indigo-700 hover:underline transition">
                   View all →
                 </Link>
               </div>
@@ -79,11 +79,12 @@ function StatCard({
 }) {
   return (
     <div
-      className={`rounded-xl border border-neutral-200 bg-white p-4 shadow-sm ${clickable ? "transition hover:border-indigo-400 hover:shadow-md cursor-pointer" : ""
-        }`}
+      className={`rounded-xl border border-slate-200 bg-white p-4 shadow-sm ${
+        clickable ? "transition hover:border-indigo-300 hover:shadow-md cursor-pointer" : ""
+      }`}
     >
-      <p className="text-2xl font-bold text-indigo-700">{value}</p>
-      <p className="mt-0.5 text-xs capitalize text-neutral-500">{label}</p>
+      <p className="text-2xl font-bold text-indigo-600">{value}</p>
+      <p className="mt-0.5 text-xs capitalize text-slate-500">{label}</p>
     </div>
   );
 }
