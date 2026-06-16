@@ -15,7 +15,7 @@ Web UI for the **Quantum Computing Expert Library**, a research knowledge base m
 If you use [nvm](https://github.com/nvm-sh/nvm):
 
 ```bash
-nvm install   # reads .nvmrc → installs Node 26
+nvm install   # reads .nvmrc → installs Node 22
 nvm use
 ```
 
