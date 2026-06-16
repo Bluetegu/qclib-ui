@@ -31,7 +31,16 @@ function entryTypeBadge(tags: string[]): { label: string; icon: React.ReactNode;
             ),
             className: "bg-teal-50 text-teal-700",
         };
-    return null;
+    // Default: paper
+    return {
+        label: "Paper",
+        icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3">
+                <path fillRule="evenodd" d="M4 2a1.5 1.5 0 0 0-1.5 1.5v9A1.5 1.5 0 0 0 4 14h8a1.5 1.5 0 0 0 1.5-1.5V6.621a1.5 1.5 0 0 0-.44-1.06L9.94 2.439A1.5 1.5 0 0 0 8.878 2H4Zm1 5.75a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5H5Zm0 3a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5H5Z" clipRule="evenodd" />
+            </svg>
+        ),
+        className: "bg-slate-100 text-slate-500",
+    };
 }
 
 export function PaperCard({ entry }: PaperCardProps) {
@@ -52,7 +61,7 @@ export function PaperCard({ entry }: PaperCardProps) {
             className="group block rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-indigo-300 hover:shadow-md"
         >
             <div className="flex items-start justify-between gap-2">
-                <h3 className="font-semibold text-slate-900 leading-snug line-clamp-2 group-hover:text-indigo-600 transition">{entry.title}</h3>
+                <h3 className="min-w-0 font-semibold text-slate-900 leading-snug line-clamp-2 group-hover:text-indigo-600 transition">{entry.title}</h3>
                 {typeBadge && (
                     <span className={`shrink-0 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${typeBadge.className}`}>
                         {typeBadge.icon}

@@ -83,9 +83,11 @@ app/
     search/route.ts         # GET /api/search?q= — Fuse.js ranked results
     ruminations/route.ts    # GET /api/ruminations — parsed rumination files
 components/
-  PaperCard.tsx             # Paper card with title, authors, tags, subdomain
+  PaperCard.tsx             # Paper card with title, authors, tags, subdomain, type badge
+  RuminationCard.tsx        # Rumination card with status badge, hypothesis, open questions
   SearchBar.tsx             # URL-param-driven search input (client component)
-  TaxonomySidebar.tsx       # Subdomain filter sidebar with counts
+  TaxonomySidebar.tsx       # Subdomain filter sidebar (desktop) / pill strip (mobile)
+  TypeFilterTabs.tsx        # All / Papers / Meetings / Discussions filter tabs
   MarkdownRenderer.tsx      # react-markdown + KaTeX renderer
 lib/
   libraryReader.ts          # FS scanner, gray-matter parser, stats aggregator
@@ -115,6 +117,20 @@ pnpm test:watch    # watch mode during development
 ```
 
 All 10 tests should pass before any commit.
+
+---
+
+## Component Preview
+
+A dev preview page renders all card variants against fixture data — no real `QCLIB_DATA_ROOT` needed:
+
+```
+http://localhost:3000/dev/cards
+```
+
+Covers: all three entry types (Paper / Meeting / Discussion), title length stress tests, author variants, all subdomain badges, missing-field edge cases, tag truncation, and all four rumination statuses (active / draft / resolved / archived).
+
+The page is not linked from anywhere in the app UI and is marked with a visible amber banner.
 
 ---
 

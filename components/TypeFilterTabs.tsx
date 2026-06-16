@@ -30,9 +30,9 @@ const TAB_ICONS: Record<string, React.ReactNode> = {
 };
 
 const TABS = [
-    { key: null,          label: "All",         iconKey: "all" },
-    { key: "papers",      label: "Papers",      iconKey: "papers" },
-    { key: "meetings",    label: "Meetings",    iconKey: "meetings" },
+    { key: null, label: "All", iconKey: "all" },
+    { key: "papers", label: "Papers", iconKey: "papers" },
+    { key: "meetings", label: "Meetings", iconKey: "meetings" },
     { key: "discussions", label: "Discussions", iconKey: "discussions" },
 ] as const;
 

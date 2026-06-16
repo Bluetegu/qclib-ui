@@ -1,14 +1,8 @@
 import { readRuminations } from "@/lib/libraryReader";
 import type { RuminationEntry } from "@/lib/libraryReader";
+import { RuminationCard } from "@/components/RuminationCard";
 
 export const revalidate = 60;
-
-const STATUS_STYLES: Record<RuminationEntry["status"], string> = {
-    draft: "bg-yellow-50 text-yellow-700",
-    active: "bg-green-50 text-green-700",
-    resolved: "bg-blue-50 text-blue-700",
-    archived: "bg-neutral-100 text-neutral-500",
-};
 
 export default function RuminationsPage() {
     let entries: RuminationEntry[] = [];
@@ -49,59 +43,7 @@ export default function RuminationsPage() {
 
             <ul className="space-y-5">
                 {entries.map((entry) => (
-                    <li
-                        key={entry.slug}
-                        className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm"
-                    >
-                        <div className="flex items-start justify-between gap-4">
-                            <h2 className="text-lg font-semibold leading-snug">{entry.title}</h2>
-                            <span
-                                className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[entry.status]}`}
-                            >
-                                {entry.status}
-                            </span>
-                        </div>
-
-                        {entry.hypothesis && (
-                            <p className="mt-2 text-sm font-medium text-neutral-700 italic">
-                                &ldquo;{entry.hypothesis}&rdquo;
-                            </p>
-                        )}
-
-                        {entry.summary && (
-                            <p className="mt-2 text-sm text-neutral-600">{entry.summary}</p>
-                        )}
-
-                        {entry.openQuestions.length > 0 && (
-                            <div className="mt-3">
-                                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400 mb-1">
-                                    Open questions
-                                </p>
-                                <ul className="list-disc list-inside space-y-0.5 text-sm text-neutral-600">
-                                    {entry.openQuestions.map((q, i) => (
-                                        <li key={i}>{q}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-
-                        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-400">
-                            {entry.filedAt && <span>Filed {entry.filedAt}</span>}
-                            {entry.themes.map((t) => (
-                                <span
-                                    key={t}
-                                    className="rounded-full bg-indigo-50 px-2 py-0.5 text-indigo-600"
-                                >
-                                    {t}
-                                </span>
-                            ))}
-                            {entry.tags.map((t) => (
-                                <span key={t} className="rounded-full bg-neutral-100 px-2 py-0.5">
-                                    {t}
-                                </span>
-                            ))}
-                        </div>
-                    </li>
+                    <RuminationCard key={entry.slug} entry={entry} />
                 ))}
             </ul>
         </div>
