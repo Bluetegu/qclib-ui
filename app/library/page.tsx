@@ -4,15 +4,16 @@ import type { Subdomain } from "@/lib/libraryReader";
 import { PaperCard } from "@/components/PaperCard";
 import { SearchBar } from "@/components/SearchBar";
 import { TaxonomySidebar } from "@/components/TaxonomySidebar";
+import { TypeFilterTabs } from "@/components/TypeFilterTabs";
 
 export const revalidate = 60;
 
 interface PageProps {
-    searchParams: Promise<{ subdomain?: string; q?: string }>;
+    searchParams: Promise<{ subdomain?: string; q?: string; type?: string }>;
 }
 
 export default async function LibraryPage({ searchParams }: PageProps) {
-    const { subdomain, q } = await searchParams;
+    const { subdomain, q, type } = await searchParams;
 
     let entries = readLibraryEntries();
     let error: string | null = null;
@@ -30,13 +31,30 @@ export default async function LibraryPage({ searchParams }: PageProps) {
         if (e.subdomain) counts[e.subdomain] = (counts[e.subdomain] ?? 0) + 1;
     }
 
-    // Filter by subdomain
-    let filtered = subdomain
-        ? entries.filter((e) => e.subdomain === subdomain)
-        : entries;
+    // Build type counts for tabs
+    const typeCounts = {
+        all: entries.length,
+        papers: entries.filter((e) => !e.tags.includes("meeting") && !e.tags.includes("discussion")).length,
+        meetings: entries.filter((e) => e.tags.includes("meeting")).length,
+        discussions: entries.filter((e) => e.tags.includes("discussion")).length,
+    };
 
-    // Filter by search query (simple case-insensitive substring match;
-    // full Fuse.js search is available via /api/search for the search bar)
+    // Filter by type
+    let filtered = entries;
+    if (type === "papers") {
+        filtered = filtered.filter((e) => !e.tags.includes("meeting") && !e.tags.includes("discussion"));
+    } else if (type === "meetings") {
+        filtered = filtered.filter((e) => e.tags.includes("meeting"));
+    } else if (type === "discussions") {
+        filtered = filtered.filter((e) => e.tags.includes("discussion"));
+    }
+
+    // Filter by subdomain
+    if (subdomain) {
+        filtered = filtered.filter((e) => e.subdomain === subdomain);
+    }
+
+    // Filter by search query
     if (q) {
         const lower = q.toLowerCase();
         filtered = filtered.filter(
@@ -52,11 +70,15 @@ export default async function LibraryPage({ searchParams }: PageProps) {
         <div className="mx-auto max-w-6xl px-6 py-10">
             <div className="mb-6">
                 <h1 className="text-3xl font-bold tracking-tight">Library</h1>
-                <p className="mt-1 text-neutral-500">{entries.length} papers indexed</p>
+                <p className="mt-1 text-slate-500">{entries.length} items indexed</p>
             </div>
 
             <Suspense>
                 <SearchBar />
+            </Suspense>
+
+            <Suspense>
+                <TypeFilterTabs counts={typeCounts} />
             </Suspense>
 
             {error && (
@@ -65,14 +87,14 @@ export default async function LibraryPage({ searchParams }: PageProps) {
                 </div>
             )}
 
-            <div className="mt-8 flex gap-8">
+            <div className="mt-6 flex flex-col gap-6 md:mt-8 md:flex-row md:gap-8">
                 <Suspense>
                     <TaxonomySidebar counts={counts} />
                 </Suspense>
 
                 <div className="flex-1 min-w-0">
                     {filtered.length === 0 ? (
-                        <p className="text-sm text-neutral-500">No papers match your filters.</p>
+                        <p className="text-sm text-slate-500">No items match your filters.</p>
                     ) : (
                         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                             {filtered.map((entry) => (

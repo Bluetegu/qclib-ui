@@ -2,13 +2,19 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #f8fafc;   /* slate-50 */
-  --surface:    #ffffff;
-  --border:     #e2e8f0;   /* slate-200 */
-  --foreground: #0f172a;   /* slate-900 */
-  --muted:      #64748b;   /* slate-500 */
-  --accent:     #6366f1;   /* indigo-500 */
-  --accent-bg:  #eef2ff;   /* indigo-50 */
+  --background: #f8fafc;
+  /* slate-50 */
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  /* slate-200 */
+  --foreground: #0f172a;
+  /* slate-900 */
+  --muted: #64748b;
+  /* slate-500 */
+  --accent: #6366f1;
+  /* indigo-500 */
+  --accent-bg: #eef2ff;
+  /* indigo-50 */
 }
 
 @theme inline {

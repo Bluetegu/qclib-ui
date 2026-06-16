@@ -38,7 +38,7 @@ export default function DashboardPage() {
           <section>
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">Overview</h2>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-              <StatCard label="Total papers" value={stats.total} />
+              <StatCard label="Total items" value={stats.total} />
               {Object.entries(stats.bySubdomain).map(([sd, count]) => (
                 <Link key={sd} href={`/library?subdomain=${sd}`}>
                   <StatCard label={sd.replace("-", " ")} value={count} clickable />
@@ -79,9 +79,8 @@ function StatCard({
 }) {
   return (
     <div
-      className={`rounded-xl border border-slate-200 bg-white p-4 shadow-sm ${
-        clickable ? "transition hover:border-indigo-300 hover:shadow-md cursor-pointer" : ""
-      }`}
+      className={`rounded-xl border border-slate-200 bg-white p-4 shadow-sm ${clickable ? "transition hover:border-indigo-300 hover:shadow-md cursor-pointer" : ""
+        }`}
     >
       <p className="text-2xl font-bold text-indigo-600">{value}</p>
       <p className="mt-0.5 text-xs capitalize text-slate-500">{label}</p>
