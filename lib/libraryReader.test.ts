@@ -73,7 +73,7 @@ This file should not be indexed.
     fs.writeFileSync(
         path.join(synthesisDir, "rumination-hypothesis-x.md"),
         `---
-pageType: synthesis
+pageType: rumination
 title: Rumination on X
 summary: An interesting hypothesis.
 hypothesis: Fault tolerance thresholds depend on noise topology.
@@ -82,6 +82,8 @@ themes:
   - error-correction
 openQuestions:
   - Can this be tested on current hardware?
+relatedSources:
+    - 2026-05-22980-automatic-dequantization
 tags: [rumination]
 filedAt: "2026-06-01"
 ---
@@ -186,6 +188,7 @@ describe("readRuminations", () => {
         fs.writeFileSync(
             file,
             `---
+pageType: rumination
 title: Bad Status
 status: unknown-value
 filedAt: "2026-06-02"
@@ -195,6 +198,26 @@ filedAt: "2026-06-02"
         const ruminations = readRuminations();
         const bad = ruminations.find((r) => r.title === "Bad Status");
         expect(bad?.status).toBe("draft");
+        fs.unlinkSync(file);
+    });
+
+    it("maps legacy statuses to the new status set", async () => {
+        const { readRuminations } = await getReader();
+        const synthesisDir = path.join(tmpDir, "syntheses", "QC");
+        const file = path.join(synthesisDir, "rumination-legacy-status.md");
+        fs.writeFileSync(
+            file,
+            `---
+pageType: rumination
+title: Legacy Status
+status: resolved
+filedAt: "2026-06-03"
+---
+`
+        );
+        const ruminations = readRuminations();
+        const legacy = ruminations.find((r) => r.title === "Legacy Status");
+        expect(legacy?.status).toBe("validated");
         fs.unlinkSync(file);
     });
 });

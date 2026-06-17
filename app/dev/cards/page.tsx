@@ -1,5 +1,6 @@
 import { PaperCard } from "@/components/PaperCard";
 import { RuminationCard } from "@/components/RuminationCard";
+import { RuminationDetailView } from "@/components/RuminationDetailView";
 import type { LibraryEntry, RuminationEntry } from "@/lib/libraryReader";
 
 // Force dynamic rendering — prevents this page from being statically prerendered
@@ -33,6 +34,22 @@ export default function DevCardsPage() {
                         <RuminationCard key={entry.slug} entry={entry} />
                     ))}
                 </ul>
+            </section>
+
+            <section>
+                <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-slate-400">Rumination detail pages</h2>
+                <div className="space-y-8">
+                    {RUMINATIONS.map((entry) => (
+                        <RuminationDetailView
+                            key={entry.slug}
+                            entry={entry}
+                            relatedSources={entry.relatedSources.map((slug) => ({
+                                slug,
+                                entry: LIBRARY_ENTRIES.find((candidate) => candidate.slug === slug) ?? null,
+                            }))}
+                        />
+                    ))}
+                </div>
             </section>
         </div>
     );
@@ -121,24 +138,50 @@ const GROUPS: { label: string; entries: LibraryEntry[] }[] = [
 
 function rumination(overrides: Partial<RuminationEntry> & { slug: string; title: string }): RuminationEntry {
     return {
+        pageType: "rumination",
         filePath: "",
         summary: "A working synthesis exploring the intersection of two research threads.",
         hypothesis: "The phenomenon observed in hardware experiments may be a special case of a broader theoretical result.",
         status: "draft",
         themes: ["error-correction", "hardware"],
         openQuestions: ["Does this hold at scale?", "What are the noise thresholds?"],
+        relatedSources: ["2026-05-22980-automatic-dequantization"],
         tags: [],
-        filedAt: "2024-06-01",
-        content: "",
+        filedAt: "2026-06-01",
+        content: `## Core logic trace
+
+We model the error channel as a weighted graph and compare decoder behavior under topology-preserving perturbations.
+
+- baseline decoder: matching
+- candidate decoder: biased matching
+
+### Sandbox checks
+
+1. Simulate 1000 rounds with fixed bias
+2. Compare threshold drift under correlated noise
+3. Validate stability for small lattice sizes
+
+Inline math: $p_{th} \approx 1.8\%$.
+
+\`\`\`ts
+const threshold = simulateThreshold({ lattice: 13, bias: 4.0 });
+console.log(threshold);
+\`\`\`
+`,
         ...overrides,
     };
 }
 
 const RUMINATIONS: RuminationEntry[] = [
-    rumination({ slug: "r-active", title: "Surface codes may exhibit threshold improvement under biased noise models", status: "active", themes: ["error-correction", "hardware"], openQuestions: ["Does bias magnitude affect the threshold monotonically?", "Can this be verified on current superconducting hardware?", "What is the optimal decoder for biased surface codes?"] }),
-    rumination({ slug: "r-draft", title: "Exploring connections between quantum walk speedup and graph isomorphism", status: "draft", themes: ["algorithms", "complexity"], hypothesis: "Quantum walks on Cayley graphs may encode group structure in a way that breaks isomorphism symmetry." }),
-    rumination({ slug: "r-resolved", title: "Fault-tolerant magic state distillation cost reduction via concatenation", status: "resolved", themes: ["error-correction"], openQuestions: [], tags: ["closed", "published"] }),
-    rumination({ slug: "r-archived", title: "Early speculation on topological codes for photonic platforms", status: "archived", hypothesis: "", summary: "", themes: [], openQuestions: [], tags: [] }),
-    rumination({ slug: "r-minimal", title: "Minimal rumination — no hypothesis, no questions, no themes", hypothesis: "", openQuestions: [], themes: [], tags: [], status: "draft" }),
+    rumination({ slug: "r-active", filedAt: "2026-06-01", title: "Surface codes may exhibit threshold improvement under biased noise models", status: "active", themes: ["error-correction", "hardware"], openQuestions: ["Does bias magnitude affect the threshold monotonically?", "Can this be verified on current superconducting hardware?", "What is the optimal decoder for biased surface codes?"], relatedSources: ["2026-05-22980-automatic-dequantization", "2026-05-23012-biased-noise-thresholds"] }),
+    rumination({ slug: "r-draft", filedAt: "2026-06-02", title: "Exploring connections between quantum walk speedup and graph isomorphism", status: "draft", themes: ["algorithms", "complexity"], hypothesis: "Quantum walks on Cayley graphs may encode group structure in a way that breaks isomorphism symmetry.", content: "### Graph note\n\nWe compared spectra for isomorphic vs non-isomorphic constructions and saw partial separation for bounded degree families." }),
+    rumination({ slug: "r-resolved", filedAt: "2026-06-03", title: "Fault-tolerant magic state distillation cost reduction via concatenation", status: "validated", themes: ["error-correction"], openQuestions: [], tags: ["closed", "published"], content: "Validation complete. Results now tracked in follow-up source notes." }),
+    rumination({ slug: "r-archived", filedAt: "2026-06-04", title: "Early speculation on topological codes for photonic platforms", status: "stale", hypothesis: "", summary: "", themes: [], openQuestions: [], tags: [], content: "No longer active after updated hardware constraints." }),
+    rumination({ slug: "r-minimal", filedAt: "2026-06-05", title: "Minimal rumination — no hypothesis, no questions, no themes", hypothesis: "", openQuestions: [], themes: [], tags: [], status: "draft", content: "Short markdown body to validate minimal layout." }),
+];
+
+const LIBRARY_ENTRIES: LibraryEntry[] = [
+    paper({ slug: "2026-05-22980-automatic-dequantization", title: "Automatic Dequantization for Structured Sampling Problems", summary: "A mock library entry used to preview related-source links.", tags: ["dequantization"] }),
+    paper({ slug: "2026-05-23012-biased-noise-thresholds", title: "Biased Noise Thresholds in Surface Code Decoding", summary: "Another mock entry for relationship previews.", subdomain: "error-correction", tags: ["threshold", "surface-code"] }),
 ];
 

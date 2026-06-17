@@ -1,10 +1,12 @@
 import type { RuminationEntry } from "@/lib/libraryReader";
+import Link from "next/link";
 
 const STATUS_STYLES: Record<RuminationEntry["status"], string> = {
-    draft: "bg-yellow-50 text-yellow-700",
-    active: "bg-green-50 text-green-700",
-    resolved: "bg-blue-50 text-blue-700",
-    archived: "bg-slate-100 text-slate-500",
+    draft: "bg-slate-100 text-slate-600",
+    active: "bg-amber-50 text-amber-700",
+    validated: "bg-emerald-50 text-emerald-700",
+    refuted: "bg-rose-50 text-rose-700",
+    stale: "bg-slate-200 text-slate-600",
 };
 
 interface RuminationCardProps {
@@ -15,7 +17,11 @@ export function RuminationCard({ entry }: RuminationCardProps) {
     return (
         <li className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-start justify-between gap-4">
-                <h2 className="min-w-0 text-lg font-semibold leading-snug text-slate-900">{entry.title}</h2>
+                <h2 className="min-w-0 text-lg font-semibold leading-snug text-slate-900">
+                    <Link href={`/ruminations/${entry.filedAt}`} className="hover:text-indigo-600 transition">
+                        {entry.title}
+                    </Link>
+                </h2>
                 <span
                     className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[entry.status]}`}
                 >
@@ -24,7 +30,7 @@ export function RuminationCard({ entry }: RuminationCardProps) {
             </div>
 
             {entry.hypothesis && (
-                <p className="mt-2 text-sm font-medium text-slate-700 italic">
+                <p className="mt-2 rounded-lg border-l-4 border-amber-200 bg-amber-50/60 px-3 py-2 text-sm font-medium text-slate-700 italic">
                     &ldquo;{entry.hypothesis}&rdquo;
                 </p>
             )}

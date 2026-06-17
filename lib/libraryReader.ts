@@ -34,18 +34,22 @@ export interface LibraryEntry {
 }
 
 export interface RuminationEntry {
+    pageType: "rumination";
     slug: string;
     filePath: string;
     title: string;
     summary: string;
     hypothesis: string;
-    status: "draft" | "active" | "resolved" | "archived";
+    status: RuminationStatus;
     themes: string[];
     openQuestions: string[];
+    relatedSources: string[];
     tags: string[];
-    filedAt: string | null;
+    filedAt: string;
     content: string;
 }
+
+export type RuminationStatus = "draft" | "active" | "validated" | "refuted" | "stale";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -129,6 +133,42 @@ function toYear(value: unknown): number | null {
     return null;
 }
 
+function ruminationDateFromPath(filePath: string): string {
+    return path.basename(filePath, ".md").replace(/^rumination-/, "");
+}
+
+function normalizeRuminationStatus(value: unknown): RuminationStatus {
+    if (value === "draft" || value === "active" || value === "validated" || value === "refuted" || value === "stale") {
+        return value;
+    }
+    if (value === "resolved") return "validated";
+    if (value === "archived") return "stale";
+    return "draft";
+}
+
+function parseRuminationFile(filePath: string, root: string): RuminationEntry | null {
+    const raw = fs.readFileSync(filePath, "utf-8");
+    const { data, content } = matter(raw);
+
+    if (data.pageType !== "rumination") return null;
+
+    return {
+        pageType: "rumination",
+        slug: toSlug(filePath, root),
+        filePath,
+        title: typeof data.title === "string" ? data.title : path.basename(filePath, ".md"),
+        summary: typeof data.summary === "string" ? data.summary : "",
+        hypothesis: typeof data.hypothesis === "string" ? data.hypothesis : "",
+        status: normalizeRuminationStatus(data.status),
+        themes: toArray(data.themes),
+        openQuestions: toArray(data.openQuestions),
+        relatedSources: toArray(data.relatedSources),
+        tags: toArray(data.tags),
+        filedAt: typeof data.filedAt === "string" ? data.filedAt : ruminationDateFromPath(filePath),
+        content: content.trim(),
+    };
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -180,28 +220,17 @@ export function readRuminations(): RuminationEntry[] {
         .filter((f) => f.startsWith("rumination-") && f.endsWith(".md"))
         .map((f) => path.join(synthesisDir, f));
 
-    const validStatuses = new Set(["draft", "active", "resolved", "archived"]);
-
-    return files.map((filePath) => {
-        const raw = fs.readFileSync(filePath, "utf-8");
-        const { data, content } = matter(raw);
-
-        const status = validStatuses.has(data.status) ? data.status : "draft";
-
-        return {
-            slug: toSlug(filePath, root),
-            filePath,
-            title: typeof data.title === "string" ? data.title : path.basename(filePath, ".md"),
-            summary: typeof data.summary === "string" ? data.summary : "",
-            hypothesis: typeof data.hypothesis === "string" ? data.hypothesis : "",
-            status,
-            themes: toArray(data.themes),
-            openQuestions: toArray(data.openQuestions),
-            tags: toArray(data.tags),
-            filedAt: typeof data.filedAt === "string" ? data.filedAt : null,
-            content: content.trim(),
-        };
+    return files.flatMap((filePath) => {
+        const entry = parseRuminationFile(filePath, root);
+        return entry ? [entry] : [];
     });
+}
+
+export function readRuminationByDate(date: string): RuminationEntry | null {
+    const root = dataRoot();
+    const filePath = path.join(root, "syntheses", "QC", `rumination-${date}.md`);
+    if (!fs.existsSync(filePath)) return null;
+    return parseRuminationFile(filePath, root);
 }
 
 /** Aggregate stats for the dashboard. */

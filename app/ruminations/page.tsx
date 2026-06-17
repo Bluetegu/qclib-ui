@@ -1,10 +1,17 @@
 import { readRuminations } from "@/lib/libraryReader";
-import type { RuminationEntry } from "@/lib/libraryReader";
+import type { RuminationEntry, RuminationStatus } from "@/lib/libraryReader";
 import { RuminationCard } from "@/components/RuminationCard";
+import { RuminationStatusTabs } from "@/components/RuminationStatusTabs";
 
 export const revalidate = 60;
 
-export default function RuminationsPage() {
+interface PageProps {
+    searchParams: Promise<{ status?: string }>;
+}
+
+export default async function RuminationsPage({ searchParams }: PageProps) {
+    const { status } = await searchParams;
+
     let entries: RuminationEntry[] = [];
     let error: string | null = null;
 
@@ -14,9 +21,26 @@ export default function RuminationsPage() {
         error = e instanceof Error ? e.message : "Failed to load ruminations";
     }
 
-    // Sort: active first, then draft, resolved, archived; within each by filedAt desc
-    const ORDER: RuminationEntry["status"][] = ["active", "draft", "resolved", "archived"];
-    entries = [...entries].sort((a, b) => {
+    const counts: Record<RuminationStatus, number> = {
+        draft: 0,
+        active: 0,
+        validated: 0,
+        refuted: 0,
+        stale: 0,
+    };
+
+    for (const entry of entries) {
+        counts[entry.status] += 1;
+    }
+
+    let filtered = entries;
+    if (status && status in counts) {
+        filtered = entries.filter((entry) => entry.status === status);
+    }
+
+    // Sort: active first, then draft, validated, refuted, stale; within each by filedAt desc
+    const ORDER: RuminationEntry["status"][] = ["active", "draft", "validated", "refuted", "stale"];
+    filtered = [...filtered].sort((a, b) => {
         const os = ORDER.indexOf(a.status) - ORDER.indexOf(b.status);
         if (os !== 0) return os;
         return (b.filedAt ?? "").localeCompare(a.filedAt ?? "");
@@ -31,18 +55,20 @@ export default function RuminationsPage() {
                 </p>
             </div>
 
+            <RuminationStatusTabs counts={counts} />
+
             {error && (
                 <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                     <strong>Error loading ruminations:</strong> {error}
                 </div>
             )}
 
-            {entries.length === 0 && !error && (
+            {filtered.length === 0 && !error && (
                 <p className="text-sm text-neutral-500">No rumination files found.</p>
             )}
 
             <ul className="space-y-5">
-                {entries.map((entry) => (
+                {filtered.map((entry) => (
                     <RuminationCard key={entry.slug} entry={entry} />
                 ))}
             </ul>
