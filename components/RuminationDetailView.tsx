@@ -80,11 +80,11 @@ export function RuminationDetailView({ entry, relatedSources, wikiLinks }: Rumin
                             related ? (
                                 <Link
                                     key={slug}
-                                    href={`/library/${slug}`}
+                                    href={`/library/${related.slug}`}
                                     className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-indigo-300 hover:shadow-md"
                                 >
                                     <p className="text-sm font-medium text-slate-900">{related.title}</p>
-                                    <p className="mt-1 text-xs text-slate-500">{slug}</p>
+                                    <p className="mt-1 text-xs text-slate-500">{related.slug}</p>
                                 </Link>
                             ) : (
                                 <div key={slug} className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4">
