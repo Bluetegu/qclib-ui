@@ -55,7 +55,7 @@ export default function DashboardPage() {
                   View all →
                 </Link>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="space-y-4">
                 {stats.recent.map((entry) => (
                   <PaperCard key={entry.slug} entry={entry} />
                 ))}

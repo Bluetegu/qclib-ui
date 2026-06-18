@@ -38,12 +38,11 @@ export default async function RuminationsPage({ searchParams }: PageProps) {
         filtered = entries.filter((entry) => entry.status === status);
     }
 
-    // Sort: active first, then draft, validated, refuted, stale; within each by filedAt desc
-    const ORDER: RuminationEntry["status"][] = ["active", "draft", "validated", "refuted", "stale"];
+    // Sort newest first by filedAt
     filtered = [...filtered].sort((a, b) => {
-        const os = ORDER.indexOf(a.status) - ORDER.indexOf(b.status);
-        if (os !== 0) return os;
-        return (b.filedAt ?? "").localeCompare(a.filedAt ?? "");
+        const byDate = b.filedAt.localeCompare(a.filedAt);
+        if (byDate !== 0) return byDate;
+        return a.title.localeCompare(b.title);
     });
 
     return (

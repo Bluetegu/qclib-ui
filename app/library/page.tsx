@@ -66,6 +66,15 @@ export default async function LibraryPage({ searchParams }: PageProps) {
         );
     }
 
+    // Sort newest first by filedAt (entries without a date go last)
+    filtered = [...filtered].sort((a, b) => {
+        const aDate = a.filedAt ?? "";
+        const bDate = b.filedAt ?? "";
+        const byDate = bDate.localeCompare(aDate);
+        if (byDate !== 0) return byDate;
+        return a.title.localeCompare(b.title);
+    });
+
     return (
         <div className="mx-auto max-w-6xl px-6 py-10">
             <div className="mb-6">
@@ -96,7 +105,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
                     {filtered.length === 0 ? (
                         <p className="text-sm text-slate-500">No items match your filters.</p>
                     ) : (
-                        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                        <div className="space-y-4">
                             {filtered.map((entry) => (
                                 <PaperCard key={entry.slug} entry={entry} />
                             ))}
